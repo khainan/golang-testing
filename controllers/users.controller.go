@@ -33,3 +33,21 @@ func (cntrl *UsersController) FetchSingleUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+func (cntrl *UsersController) CreateSingleUser(c echo.Context) error {
+	result, err := cntrl.usersModel.CreateSingleUser(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func (cntrl *UsersController) DeleteSingleUser(c echo.Context) error {
+	result, err := cntrl.usersModel.DeleteSingleUser(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}

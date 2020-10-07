@@ -26,7 +26,11 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Dariiiii ECHOOOO")
 	})
+
 	e.GET("/users", usersCntrl.FetchAllUsers)
 	e.GET("/users/:id", usersCntrl.FetchSingleUser)
+	e.POST("/users", usersCntrl.CreateSingleUser)
+	e.DELETE("/users/:id", usersCntrl.DeleteSingleUser)
+
 	e.Logger.Fatal(e.Start(":1234"))
 }
