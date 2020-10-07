@@ -27,5 +27,6 @@ func main() {
 		return c.String(http.StatusOK, "Dariiiii ECHOOOO")
 	})
 	e.GET("/users", usersCntrl.FetchAllUsers)
+	e.GET("/users/:id", usersCntrl.FetchSingleUser)
 	e.Logger.Fatal(e.Start(":1234"))
 }

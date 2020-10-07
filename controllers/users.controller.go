@@ -24,3 +24,12 @@ func (cntrl *UsersController) FetchAllUsers(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+func (cntrl *UsersController) FetchSingleUser(c echo.Context) error {
+	result, err := cntrl.usersModel.FetchSingleUser(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
