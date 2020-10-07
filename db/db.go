@@ -7,26 +7,16 @@ import (
 	"github.com/khainan/config"
 )
 
-var db *sql.DB
-var err error
-
-func Init() {
+func Init() (*sql.DB, error) {
 	conf := config.GetConfig()
-
 	connectionString := conf.DB_USERNAME + ":" + conf.DB_PASSWORD + "@tcp(" + conf.DB_HOST + ":" + conf.DB_PORT + ")/" + conf.DB_NAME
-
-	db, err = sql.Open("mysql", connectionString)
-
+	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
-		panic("connection error...")
+		return nil, err
 	}
-
 	err = db.Ping()
 	if err != nil {
-		panic("DNS Invalid")
+		return nil, err
 	}
-}
-
-func CreateCon() *sql.DB {
-	return db
+	return db, nil
 }

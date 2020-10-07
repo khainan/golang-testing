@@ -9,11 +9,15 @@ import (
 
 // Bikin struct yang punya UsersModel untuk dipakai FetchAllUsers
 type UsersController struct {
-	UsersModel models.UsersModel
+	usersModel *models.UsersModel
+}
+
+func NewUsersController(usersModel *models.UsersModel) *UsersController {
+	return &UsersController{usersModel: usersModel}
 }
 
 func (cntrl *UsersController) FetchAllUsers(c echo.Context) error {
-	result, err := cntrl.UsersModel.FetchAllUsers()
+	result, err := cntrl.usersModel.FetchAllUsers()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}

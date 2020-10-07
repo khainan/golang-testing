@@ -1,12 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
-	"github.com/khainan/config"
 	"github.com/khainan/controllers"
+	"github.com/khainan/db"
 	"github.com/khainan/models"
 	"github.com/labstack/echo"
 
@@ -14,20 +13,14 @@ import (
 )
 
 func main() {
-	conf := config.GetConfig()
-	connectionString := conf.DB_USERNAME + ":" + conf.DB_PASSWORD + "@tcp(" + conf.DB_HOST + ":" + conf.DB_PORT + ")/" + conf.DB_NAME
-	db, err := sql.Open("mysql", connectionString)
+	database, err := db.Init()
 	if err != nil {
-		log.Fatalf("Unable to connect to %s: %s\n", connectionString, err)
-	}
-	err = db.Ping()
-	if err != nil {
-		log.Fatal("DNS Invalid")
+		log.Fatal(err)
 	}
 
 	// Bikin instance UsersModel dengan parameter db
-	usersModel := models.UsersModel{DB: db}
-	usersCntrl := controllers.UsersController{UsersModel: usersModel}
+	usersModel := models.NewUsersModel(database)
+	usersCntrl := controllers.NewUsersController(usersModel)
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {

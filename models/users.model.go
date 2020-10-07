@@ -12,7 +12,11 @@ type Users struct {
 }
 
 type UsersModel struct {
-	DB *sql.DB
+	db *sql.DB
+}
+
+func NewUsersModel(db *sql.DB) *UsersModel {
+	return &UsersModel{db: db}
 }
 
 func (m *UsersModel) FetchAllUsers() (Response, error) {
@@ -22,7 +26,7 @@ func (m *UsersModel) FetchAllUsers() (Response, error) {
 
 	sqlStatement := "SELECT * FROM Users"
 
-	rows, err := m.DB.Query(sqlStatement)
+	rows, err := m.db.Query(sqlStatement)
 	defer rows.Close()
 
 	if err != nil {
