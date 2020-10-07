@@ -17,7 +17,7 @@ func NewUsersController(usersModel *models.UsersModel) *UsersController {
 }
 
 func (cntrl *UsersController) FetchAllUsers(c echo.Context) error {
-	result, err := cntrl.usersModel.FetchAllUsers()
+	result, err := cntrl.usersModel.FetchAllUsers(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}

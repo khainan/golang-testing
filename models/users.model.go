@@ -21,12 +21,18 @@ func NewUsersModel(db *sql.DB) *UsersModel {
 	return &UsersModel{db: db}
 }
 
-func (m *UsersModel) FetchAllUsers() (Response, error) {
+func (m *UsersModel) FetchAllUsers(c echo.Context) (Response, error) {
 	var obj Users
 	var newData []Users
 	var res Response
 
+	nameParams := c.QueryParam("name")
+
 	sqlStatement := "SELECT * FROM Users"
+
+	if nameParams != "" {
+		sqlStatement = "SELECT * FROM Users WHERE name LIKE " + "'" + "%" + nameParams + "%" + "'"
+	}
 
 	rows, err := m.db.Query(sqlStatement)
 	defer rows.Close()
