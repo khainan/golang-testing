@@ -134,3 +134,34 @@ func (m *UsersModel) DeleteSingleUser(c echo.Context) (Response, error) {
 
 	return res, nil
 }
+
+func (m *UsersModel) UpdateSingleUser(c echo.Context) (Response, error) {
+	var res Response
+
+	id := c.Param("id")
+	newName := c.FormValue("name")
+
+	sqlStatement := "UPDATE Users SET name = ? WHERE id = ?"
+	stmt, err := m.db.Prepare(sqlStatement)
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(newName, id)
+	if err != nil {
+		return res, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Success"
+	res.Data = map[string]int64{
+		"rows_affected:": rowsAffected,
+	}
+
+	return res, nil
+}

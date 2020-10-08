@@ -31,6 +31,7 @@ func main() {
 	e.GET("/users/:id", usersCntrl.FetchSingleUser)
 	e.POST("/users", usersCntrl.CreateSingleUser)
 	e.DELETE("/users/:id", usersCntrl.DeleteSingleUser)
+	e.PUT("/users/:id", usersCntrl.UpdateSingleUser)
 
 	e.Logger.Fatal(e.Start(":1234"))
 }
