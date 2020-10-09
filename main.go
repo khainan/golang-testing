@@ -19,8 +19,8 @@ func main() {
 	}
 
 	// Bikin instance UsersModel dengan parameter db
-	usersModel := models.NewUsersModel(database)
-	usersCntrl := controllers.NewUsersController(usersModel)
+	userModel := models.NewUserModel(database)
+	usersCntrl := controllers.NewUserController(userModel)
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {

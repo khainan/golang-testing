@@ -2,91 +2,84 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
 )
 
-type Users struct {
+type User struct {
 	Id       int    `json:"id"`
 	Name     string `json:"name"`
 	UserType string `json:"user_type"`
 }
 
-type UsersModel struct {
+type UserModel struct {
 	db *sql.DB
 }
 
-func NewUsersModel(db *sql.DB) *UsersModel {
-	return &UsersModel{db: db}
+func NewUserModel(db *sql.DB) *UserModel {
+	return &UserModel{db: db}
 }
 
-func (m *UsersModel) FetchAllUsers(c echo.Context) (Response, error) {
-	var obj Users
-	var newData []Users
-	var res Response
-
-	nameParams := c.QueryParam("name")
-
+func (m *UserModel) FetchAllUsers(userName string) (users []User, err error) {
 	sqlStatement := "SELECT * FROM Users"
-
-	if nameParams != "" {
-		sqlStatement = "SELECT * FROM Users WHERE name LIKE " + "'" + "%" + nameParams + "%" + "'"
+	if userName != "" {
+		userName = fmt.Sprintf("%%%s%%", userName)
+		sqlStatement = sqlStatement + " WHERE name LIKE ?"
 	}
 
-	rows, err := m.db.Query(sqlStatement)
+	stmt, err := m.db.Prepare(sqlStatement)
+	if err != nil {
+		return
+	}
+
+	rows, err := stmt.Query()
+	if userName != "" {
+		rows, err = stmt.Query(userName)
+	}
+	if err != nil {
+		return
+	}
 	defer rows.Close()
 
-	if err != nil {
-		return res, err
-	}
-
+	users = make([]User, 0)
 	for rows.Next() {
-		err = rows.Scan(&obj.Id, &obj.Name, &obj.UserType)
-		if err != nil {
-			return res, err
+		var user User
+		if err = rows.Scan(&user.Id, &user.Name, &user.UserType); err != nil {
+			return
 		}
-		newData = append(newData, obj)
+		users = append(users, user)
 	}
-
-	res.Status = http.StatusOK
-	res.Message = "Success"
-	res.Data = newData
-
-	return res, nil
+	return
 }
 
-func (m *UsersModel) FetchSingleUser(c echo.Context) (Response, error) {
-	var obj Users
-	var newData []Users
-	var res Response
+func (m *UserModel) FetchSingleUser(id string) (users []User, err error) {
+	sqlStatement := "SELECT * FROM Users WHERE id = ?"
+	stmt, err := m.db.Prepare(sqlStatement)
+	if err != nil {
+		return
+	}
 
-	id := c.Param("id")
-	sqlStatement := "SELECT * FROM Users WHERE id = " + id
-	rows, err := m.db.Query(sqlStatement)
-
+	rows, err := stmt.Query(id)
+	if err != nil {
+		return
+	}
 	defer rows.Close()
 
-	if err != nil {
-		return res, err
-	}
-
+	users = make([]User, 0)
 	for rows.Next() {
-		err = rows.Scan(&obj.Id, &obj.Name, &obj.UserType)
-		if err != nil {
-			return res, err
+		var user User
+		if err = rows.Scan(&user.Id, &user.Name, &user.UserType); err != nil {
+			return
 		}
-		newData = append(newData, obj)
+		users = append(users, user)
 	}
 
-	res.Status = http.StatusOK
-	res.Message = "Success"
-	res.Data = newData
-
-	return res, nil
+	return
 }
 
-func (m *UsersModel) CreateSingleUser(c echo.Context) (Response, error) {
+func (m *UserModel) CreateSingleUser(c echo.Context) (Response, error) {
 	var res Response
 
 	name := c.FormValue("name")
@@ -117,7 +110,7 @@ func (m *UsersModel) CreateSingleUser(c echo.Context) (Response, error) {
 	return res, nil
 }
 
-func (m *UsersModel) DeleteSingleUser(c echo.Context) (Response, error) {
+func (m *UserModel) DeleteSingleUser(c echo.Context) (Response, error) {
 	var res Response
 
 	id := c.Param("id")
@@ -135,7 +128,7 @@ func (m *UsersModel) DeleteSingleUser(c echo.Context) (Response, error) {
 	return res, nil
 }
 
-func (m *UsersModel) UpdateSingleUser(c echo.Context) (Response, error) {
+func (m *UserModel) UpdateSingleUser(c echo.Context) (Response, error) {
 	var res Response
 
 	id := c.Param("id")
