@@ -3,9 +3,6 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"net/http"
-
-	"github.com/labstack/echo"
 )
 
 type User struct {
@@ -79,82 +76,38 @@ func (m *UserModel) FetchSingleUser(id string) (users []User, err error) {
 	return
 }
 
-func (m *UserModel) CreateSingleUser(c echo.Context) (Response, error) {
-	var res Response
-
-	name := c.FormValue("name")
-	userType := c.FormValue("user_type")
-
+func (m *UserModel) CreateSingleUser(name string, userType string) (Response, err error) {
 	sqlStatement := "INSERT Users (name, user_type) VALUES (?, ?)"
 	stmt, err := m.db.Prepare(sqlStatement)
 	if err != nil {
-		return res, err
+		return
 	}
 
-	result, err := stmt.Exec(name, userType)
-	if err != nil {
-		return res, err
-	}
+	stmt.Exec(name, userType)
 
-	lastInsertedId, err := result.LastInsertId()
-	if err != nil {
-		return res, err
-	}
-
-	res.Status = http.StatusOK
-	res.Message = "Success Adding User"
-	res.Data = map[string]int64{
-		"last_inserted_id:": lastInsertedId,
-	}
-
-	return res, nil
+	return
 }
 
-func (m *UserModel) DeleteSingleUser(c echo.Context) (Response, error) {
-	var res Response
-
-	id := c.Param("id")
-	sqlStatement := "DELETE FROM Users WHERE id = " + id
-	stmt, err := m.db.Query(sqlStatement)
-
+func (m *UserModel) DeleteSingleUser(id string) (Response, err error) {
+	sqlStatement := "DELETE FROM Users WHERE id = ?"
+	stmt, err := m.db.Prepare(sqlStatement)
 	if err != nil {
-		return res, err
+		return
 	}
 
-	res.Status = http.StatusOK
-	res.Message = "Success Deleting User"
-	res.Data = stmt
+	stmt.Query(id)
 
-	return res, nil
+	return
 }
 
-func (m *UserModel) UpdateSingleUser(c echo.Context) (Response, error) {
-	var res Response
-
-	id := c.Param("id")
-	newName := c.FormValue("name")
-
+func (m *UserModel) UpdateSingleUser(id string, newName string) (Response, err error) {
 	sqlStatement := "UPDATE Users SET name = ? WHERE id = ?"
 	stmt, err := m.db.Prepare(sqlStatement)
 	if err != nil {
-		return res, err
+		return
 	}
 
-	result, err := stmt.Exec(newName, id)
-	if err != nil {
-		return res, err
-	}
+	stmt.Exec(newName, id)
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return res, err
-	}
-
-	res.Status = http.StatusOK
-	res.Message = "Success"
-	res.Data = map[string]int64{
-		"rows_affected:": rowsAffected,
-	}
-
-	return res, nil
+	return
 }

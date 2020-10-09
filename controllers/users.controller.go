@@ -36,7 +36,9 @@ func (cntrl *UserController) FetchSingleUser(c echo.Context) error {
 }
 
 func (cntrl *UserController) CreateSingleUser(c echo.Context) error {
-	result, err := cntrl.userModel.CreateSingleUser(c)
+	name := c.FormValue("name")
+	userType := c.FormValue("user_type")
+	result, err := cntrl.userModel.CreateSingleUser(name, userType)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
@@ -45,7 +47,8 @@ func (cntrl *UserController) CreateSingleUser(c echo.Context) error {
 }
 
 func (cntrl *UserController) DeleteSingleUser(c echo.Context) error {
-	result, err := cntrl.userModel.DeleteSingleUser(c)
+	id := c.Param("id")
+	result, err := cntrl.userModel.DeleteSingleUser(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
@@ -54,7 +57,9 @@ func (cntrl *UserController) DeleteSingleUser(c echo.Context) error {
 }
 
 func (cntrl *UserController) UpdateSingleUser(c echo.Context) error {
-	result, err := cntrl.userModel.UpdateSingleUser(c)
+	id := c.Param("id")
+	newName := c.FormValue("name")
+	result, err := cntrl.userModel.UpdateSingleUser(id, newName)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
